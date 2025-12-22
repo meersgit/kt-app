@@ -75,7 +75,8 @@ def generate_summary(text, api_key):
     
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Using a more standard model name that's likely supported in v1
+        model = genai.GenerativeModel('gemini-pro')
         prompt = f"""
         Please summarize the following project document. 
         Focus on:
@@ -85,7 +86,7 @@ def generate_summary(text, api_key):
         4. Key decisions
 
         Document Content:
-        {text[:10000]}  # Limit context for summary if needed, though Gemini has large window
+        {text[:10000]}
         """
         response = model.generate_content(prompt)
         return response.text
@@ -95,16 +96,13 @@ def generate_summary(text, api_key):
 def chat_with_docs(query, docs_context, chat_history, api_key):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-pro')
         
         # Construct Context from all docs
         context_str = ""
         for filename, doc_data in docs_context.items():
             context_str += f"\n--- Document: {filename} ---\n"
             context_str += f"Summary: {doc_data['summary']}\n"
-            # We can include full text if it fits, or chunks. For simple KT, summary + first chunk might work, 
-            # or relying on the large context window of Gemini 1.5 Flash (1M tokens).
-            # We'll try to dump as much as possible for now.
             context_str += f"Content: {doc_data['text'][:20000]}\n" 
 
         prompt = f"""
