@@ -143,11 +143,7 @@ def main_app():
     st.sidebar.title(f"Welcome, {st.session_state.get('username', 'User')}")
     
     # API Key Handling
-    api_key = st.sidebar.text_input("Gemini API Key", type="password")
-    if not api_key:
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-             st.sidebar.warning("Please enter a Gemini API Key to use AI features.")
+    api_key = "AIzaSyCUyGSDCNQwWosIttg52jxVFPvoAFmZOms"
     
     tab1, tab2, tab3 = st.tabs(["Upload & Process", "Summaries", "Chatbot"])
 
