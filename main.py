@@ -75,8 +75,8 @@ def generate_summary(text, api_key):
     
     try:
         genai.configure(api_key=api_key)
-        # Using the specific requested model
-        model = genai.GenerativeModel('gemini-1.0-pro')
+        # Using a model that is confirmed to be available and support generateContent
+        model = genai.GenerativeModel('gemini-2.5-flash')
         prompt = f"""
         Please summarize the following project document. 
         Focus on:
@@ -96,7 +96,7 @@ def generate_summary(text, api_key):
 def chat_with_docs(query, docs_context, chat_history, api_key):
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.0-pro')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         
         # Construct Context from all docs
         context_str = ""
