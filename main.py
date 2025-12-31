@@ -13,20 +13,34 @@ import boto3
 # Load environment variables
 load_dotenv()
 
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', '').strip(),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', '').strip(),
-    region_name=os.getenv('AWS_REGION', '').strip(),
-    verify=True,  # Enable SSL verification
-    use_ssl=True,  # Use SSL/TLS for connections
-    config=boto3.session.Config(
-        signature_version='s3v4',
-        retries={'max_attempts': 3},
-    )
-)
-S3_BUCKET = os.getenv('S3_BUCKET_NAME')
+# Initialize S3 client only if AWS credentials are provided
+s3_client = None
+S3_BUCKET = None
 S3_USERS_KEY = 'users/credentials.json'
+
+aws_access_key = os.getenv('AWS_ACCESS_KEY_ID', '').strip()
+aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY', '').strip()
+aws_region = os.getenv('AWS_REGION', '').strip()
+s3_bucket_name = os.getenv('S3_BUCKET_NAME', '').strip()
+
+if aws_access_key and aws_secret_key and aws_region and s3_bucket_name:
+    try:
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=aws_access_key,
+            aws_secret_access_key=aws_secret_key,
+            region_name=aws_region,
+            verify=True,
+            use_ssl=True,
+            config=boto3.session.Config(
+                signature_version='s3v4',
+                retries={'max_attempts': 3},
+            )
+        )
+        S3_BUCKET = s3_bucket_name
+    except Exception as e:
+        print(f"Warning: Could not initialize S3 client: {e}")
+        s3_client = None
 
 
 # --- Configuration & Setup ---
@@ -44,6 +58,9 @@ def get_users_from_s3() -> dict:
     Returns:
         dict: Dictionary containing username-password pairs
     """
+    if not s3_client or not S3_BUCKET:
+        return {}  # S3 not configured, return empty dict
+    
     try:
         response = s3_client.get_object(Bucket=S3_BUCKET, Key=S3_USERS_KEY)
         users_data = json.loads(response['Body'].read().decode('utf-8'))
@@ -65,6 +82,9 @@ def save_users_to_s3(users_data: dict) -> bool:
     Returns:
         bool: True if successful, False otherwise
     """
+    if not s3_client or not S3_BUCKET:
+        return False  # S3 not configured
+    
     try:
         users_json = json.dumps(users_data)
         s3_client.put_object(
