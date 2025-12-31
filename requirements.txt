@@ -1,0 +1,13 @@
+streamlit
+google-generativeai
+python-dotenv
+requests
+pandas
+pillow
+streamlit-authenticator
+PyPDF2
+boto3
+supabase
+pypdf
+python-docx
+
