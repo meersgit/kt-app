@@ -279,17 +279,21 @@ def login_page():
                 else:
                     st.error("Invalid password")
             else:
-                # New user - add to S3
+                # New user - try to save to S3 (but don't block login if it fails)
                 users[email] = password
-                if save_users_to_s3(users):
-                    st.session_state.authenticated = True
-                    st.session_state.username = email
-                    # Store user login in Supabase
-                    store_user_login(email)
+                s3_saved = save_users_to_s3(users)
+                
+                # Allow login regardless of S3 save status
+                st.session_state.authenticated = True
+                st.session_state.username = email
+                # Store user login in Supabase
+                store_user_login(email)
+                
+                if s3_saved:
                     st.success(f"New user {email} created and saved to S3!")
-                    st.rerun()
                 else:
-                    st.error("Failed to save user to S3")
+                    st.warning(f"New user {email} created! (S3 not configured - user saved locally only)")
+                st.rerun()
         else:
             st.error("Please enter email and password")
 
