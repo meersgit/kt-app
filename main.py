@@ -1,4 +1,6 @@
 import streamlit as st  # pyright: ignore[reportMissingImports]
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning)
 import google.generativeai as genai  # pyright: ignore[reportMissingImports]
 import os
 import json
