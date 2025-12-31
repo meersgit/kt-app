@@ -302,7 +302,7 @@ def main_app():
     st.sidebar.title(f"Welcome, {st.session_state.get('username', 'User')}")
     
     # API Key Handling - Get from environment variable (optional)
-    api_key = os.getenv('GOOGLE_API_KEY', '').strip()
+    api_key = os.getenv('GEMINI_API_KEY', '').strip()
     
     tab1, tab2, tab3 = st.tabs(["Upload & Process", "Summaries", "Chatbot"])
 
@@ -382,7 +382,7 @@ def main_app():
         # Chat input
         if prompt := st.chat_input("Ask a question about the project..."):
             if not api_key:
-                st.warning("⚠️ Chat feature requires API key. Please configure GOOGLE_API_KEY in .env file.")
+                st.warning("⚠️ Chat feature requires API key. Please configure GEMINI_API_KEY in .env file.")
             else:
                 # Add user message
                 st.session_state.chat_history.append({"role": "user", "content": prompt})
