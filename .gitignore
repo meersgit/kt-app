@@ -4,3 +4,36 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.local/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploaded files (optional - you may want to track these)
+# uploaded_docs/*.pdf
+# uploaded_docs/*.docx
+# uploaded_docs/*.txt
