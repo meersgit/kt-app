@@ -301,8 +301,8 @@ def login_page():
 def main_app():
     st.sidebar.title(f"Welcome, {st.session_state.get('username', 'User')}")
     
-    # API Key Handling
-    api_key = "AIzaSyCUyGSDCNQwWosIttg52jxVFPvoAFmZOms"
+    # API Key Handling - Get from environment variable (optional)
+    api_key = os.getenv('GOOGLE_API_KEY', '').strip()
     
     tab1, tab2, tab3 = st.tabs(["Upload & Process", "Summaries", "Chatbot"])
 
@@ -314,7 +314,25 @@ def main_app():
         if uploaded_files:
             if st.button("Process Documents"):
                 if not api_key:
-                    st.error("API Key required for summarization.")
+                    st.warning("⚠️ API Key not configured. Documents will be uploaded but not summarized.")
+                    # Process documents without summarization
+                    progress_bar = st.progress(0)
+                    for i, uploaded_file in enumerate(uploaded_files):
+                        if uploaded_file.name not in st.session_state.documents:
+                            with st.spinner(f"Processing {uploaded_file.name}..."):
+                                file_path, text = process_file(uploaded_file)
+                                summary = "Summary not available - API key not configured."
+                                
+                                st.session_state.documents[uploaded_file.name] = {
+                                    "text": text,
+                                    "summary": summary,
+                                    "uploaded_by": st.session_state.username,
+                                    "file_path": file_path
+                                }
+                                # Store file upload in Supabase
+                                store_file_upload(st.session_state.username, uploaded_file.name, file_path)
+                        progress_bar.progress((i + 1) / len(uploaded_files))
+                    st.success("Documents processed successfully! (Note: Summaries not generated - API key needed)")
                 else:
                     progress_bar = st.progress(0)
                     for i, uploaded_file in enumerate(uploaded_files):
@@ -364,7 +382,7 @@ def main_app():
         # Chat input
         if prompt := st.chat_input("Ask a question about the project..."):
             if not api_key:
-                st.error("API Key required.")
+                st.warning("⚠️ Chat feature requires API key. Please configure GOOGLE_API_KEY in .env file.")
             else:
                 # Add user message
                 st.session_state.chat_history.append({"role": "user", "content": prompt})
